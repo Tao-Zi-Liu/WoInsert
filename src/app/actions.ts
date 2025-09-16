@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase-config";
+import { adminDb } from "@/lib/firebase-admin-config";
 import { type Task } from "@/lib/definitions";
 import { validateAndExplainData, type ValidationInput } from "@/ai/flows/validate-and-explain-data";
 import { formatInTimeZone } from 'date-fns-tz';
