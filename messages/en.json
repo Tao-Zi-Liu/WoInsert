@@ -26,8 +26,8 @@
       "addRow": "Add Row"
     },
     "form": {
-      "workOrderId": "Work Order ID",
-      "workListId": "Work List ID",
+      "workOrderId": "WOID",
+      "workListId": "WLID",
       "quantity": "Quantity",
       "startDate": "Start Date",
       "endDate": "End Date",
@@ -56,8 +56,8 @@
     "history": {
       "title": "Submission History",
       "description": "A real-time view of all submitted production tasks.",
-      "workOrderId": "Work Order ID",
-      "workListId": "Work List ID",
+      "workOrderId": "WOID",
+      "workListId": "WLID",
       "quantity": "Quantity",
       "plannedStart": "Planned Start",
       "plannedEnd": "Planned End", 

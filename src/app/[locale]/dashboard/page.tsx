@@ -18,6 +18,7 @@ import { submitTasks } from "@/app/actions";
 import { CalendarIcon, Download, FileUp, Loader2, Plus, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import PageHeader from "@/components/page-header";
+import { useParams } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,30 +29,112 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
-const taskSchema = z.object({
-  rowId: z.string(),
-  WO_WOID: z.string().min(1, "WOID is required"),
-  WO_WLID: z.string().min(1, "WLID is required"),
-  WO_XQSL: z.string().refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
-    message: "Must be a number > 0",
-  }),
-  WO_JHKGRQ: z.string().min(1, "Start date is required"),
-  WO_JHWGRQ: z.string().min(1, "End date is required"),
-  WO_BMID: z.string().min(1, "Department is required"),
-});
-
-const formSchema = z.object({
-  tasks: z.array(taskSchema),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+// Inline translations to avoid configuration issues
+const translations = {
+  en: {
+    dashboard: {
+      dataEntry: "Data Entry",
+      dataEntryDescription: "Add, import, or manage your production tasks.",
+      template: "Template",
+      import: "Import",
+      addRow: "Add Row"
+    },
+    form: {
+      workOrderId: "WOID",
+      workListId: "WLID",
+      quantity: "Quantity",
+      startDate: "Start Date",
+      endDate: "End Date",
+      department: "Department",
+      action: "Action",
+      pickDate: "Pick a date",
+      selectDept: "Select dept.",
+      batchSubmit: "Batch Submit",
+      noTasks: "No tasks added. Click 'Add Row' or 'Import' to start.",
+      confirmSubmission: "Are you sure?",
+      confirmDescription: "This will submit all {count} task(s) to the production system. This action cannot be undone.",
+      cancel: "Cancel",
+      continue: "Continue Submission",
+      submissionSuccessful: "Submission Successful",
+      allTasksSubmitted: "All tasks have been submitted.",
+      submissionFailed: "Submission Failed",
+      checkErrors: "Please check the errors on each row."
+    },
+    departments: {
+      FIN: "Finishing",
+      ASM: "Assembly",
+      QAC: "Quality Control",
+      PKG: "Packaging",
+      WHS: "Warehouse"
+    }
+  },
+  zh: {
+    dashboard: {
+      dataEntry: "数据录入",
+      dataEntryDescription: "添加、导入或管理您的生产任务。",
+      template: "模板",
+      import: "导入",
+      addRow: "添加行"
+    },
+    form: {
+      workOrderId: "生产任务单号",
+      workListId: "物料编码",
+      quantity: "数量",
+      startDate: "计划开工日期",
+      endDate: "计划完工日期",
+      department: "完工部门",
+      action: "操作",
+      pickDate: "选择日期",
+      selectDept: "选择部门",
+      batchSubmit: "批量提交",
+      noTasks: "未添加任务。点击\"添加行\"或\"导入\"开始。",
+      confirmSubmission: "确认提交？",
+      confirmDescription: "这将向生产系统提交全部 {count} 个任务。此操作无法撤销。",
+      cancel: "取消",
+      continue: "继续提交",
+      submissionSuccessful: "提交成功",
+      allTasksSubmitted: "所有任务已提交。",
+      submissionFailed: "提交失败",
+      checkErrors: "请检查每行的错误。"
+    },
+    departments: {
+      FIN: "精整",
+      ASM: "装配",
+      QAC: "质量控制",
+      PKG: "包装",
+      WHS: "仓库"
+    }
+  }
+};
 
 export default function DataEntryPage() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const params = useParams();
+  const locale = (params.locale as string) || 'en';
+  const t = translations[locale as keyof typeof translations] || translations.en;
+
+  // Move taskSchema inside component where locale is available
+  const taskSchema = z.object({
+    rowId: z.string(),
+    WO_WOID: z.string().min(1, locale === 'zh' ? "生产任务单号为必填项" : "Work Order ID is required"),
+    WO_WLID: z.string().min(1, locale === 'zh' ? "物料编码为必填" : "Work List ID is required"),
+    WO_XQSL: z.string().min(1, locale === 'zh' ? "数量为必填项" : "Quantity is required").refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: locale === 'zh' ? "数量必须大于0" : "Quantity must be greater than 0",
+    }),
+    WO_JHKGRQ: z.string().min(1, locale === 'zh' ? "开始日期为必填项" : "Start date is required"),
+    WO_JHWGRQ: z.string().min(1, locale === 'zh' ? "结束日期为必填项" : "End date is required"),
+    WO_BMID: z.string().min(1, locale === 'zh' ? "部门为必填项" : "Department is required"),
+  });
+
+  const formSchema = z.object({
+    tasks: z.array(taskSchema),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -80,8 +163,11 @@ export default function DataEntryPage() {
     if (file) {
       importFromExcel(file, (data) => {
         const newTasks = data.map(item => ({...item, rowId: crypto.randomUUID()}));
-        replace(newTasks as any[]); // Use replace to overwrite existing data
-        toast({ title: "Import Successful", description: `${newTasks.length} rows have been imported.` });
+        replace(newTasks as any[]);
+        toast({ 
+          title: t.form.submissionSuccessful, 
+          description: `${newTasks.length} rows have been imported.` 
+        });
       });
     }
     if (event.target) {
@@ -97,15 +183,15 @@ export default function DataEntryPage() {
 
       if (result.success) {
         toast({
-          title: "Submission Successful",
-          description: "All tasks have been submitted.",
+          title: t.form.submissionSuccessful,
+          description: t.form.allTasksSubmitted,
         });
         replace([]);
       } else {
         toast({
           variant: "destructive",
-          title: "Submission Failed",
-          description: "Please check the errors on each row.",
+          title: t.form.submissionFailed,
+          description: t.form.checkErrors,
         });
         result.errors?.forEach((error) => {
           if (error.rowIndex !== undefined && error.message) {
@@ -131,12 +217,16 @@ export default function DataEntryPage() {
   return (
     <div className="flex flex-col h-full bg-background">
       <PageHeader
-        title="Data Entry"
-        description="Add, import, or manage your production tasks."
+        title={t.dashboard.dataEntry}
+        description={t.dashboard.dataEntryDescription}
       >
         <div className="flex gap-2">
-            <Button variant="outline" onClick={downloadExcelTemplate}><Download className="mr-2"/> Template</Button>
-            <Button variant="outline" onClick={handleImportClick}><FileUp className="mr-2"/> Import</Button>
+            <Button variant="outline" onClick={downloadExcelTemplate}>
+              <Download className="mr-2"/> {t.dashboard.template}
+            </Button>
+            <Button variant="outline" onClick={handleImportClick}>
+              <FileUp className="mr-2"/> {t.dashboard.import}
+            </Button>
              <input
               type="file"
               ref={fileInputRef}
@@ -144,7 +234,9 @@ export default function DataEntryPage() {
               className="hidden"
               accept=".xlsx, .xls"
             />
-            <Button onClick={addRow}><Plus className="mr-2"/> Add Row</Button>
+            <Button onClick={addRow}>
+              <Plus className="mr-2"/> {t.dashboard.addRow}
+            </Button>
         </div>
       </PageHeader>
       <main className="flex-1 overflow-y-auto p-6">
@@ -153,13 +245,25 @@ export default function DataEntryPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[150px]">Work Order ID</TableHead>
-                  <TableHead className="w-[150px]">Work List ID</TableHead>
-                  <TableHead className="w-[120px]">Quantity</TableHead>
-                  <TableHead className="w-[180px]">Start Date</TableHead>
-                  <TableHead className="w-[180px]">End Date</TableHead>
-                  <TableHead className="w-[180px]">Department</TableHead>
-                  <TableHead className="w-[50px] text-right">Action</TableHead>
+                  <TableHead className="w-[150px]">
+                    {t.form.workOrderId} <span className="text-red-500">*</span>
+                  </TableHead>
+                  <TableHead className="w-[150px]">
+                    {t.form.workListId} <span className="text-red-500">*</span>
+                  </TableHead>
+                  <TableHead className="w-[120px]">
+                    {t.form.quantity} <span className="text-red-500">*</span>
+                  </TableHead>
+                  <TableHead className="w-[180px]">
+                    {t.form.startDate} <span className="text-red-500">*</span>
+                  </TableHead>
+                  <TableHead className="w-[180px]">
+                    {t.form.endDate} <span className="text-red-500">*</span>
+                  </TableHead>
+                  <TableHead className="w-[180px]">
+                    {t.form.department} <span className="text-red-500">*</span>
+                  </TableHead>
+                  <TableHead className="w-[50px] text-right">{t.form.action}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -186,7 +290,7 @@ export default function DataEntryPage() {
                                           )}
                                         >
                                           <CalendarIcon className="mr-2 h-4 w-4" />
-                                          {controllerField.value ? format(new Date(controllerField.value), "PPP") : <span>Pick a date</span>}
+                                          {controllerField.value ? format(new Date(controllerField.value), "PPP") : <span>{t.form.pickDate}</span>}
                                         </Button>
                                       </PopoverTrigger>
                                       <PopoverContent className="w-auto p-0">
@@ -207,11 +311,13 @@ export default function DataEntryPage() {
                                   <div>
                                     <Select onValueChange={controllerField.onChange} defaultValue={controllerField.value}>
                                       <SelectTrigger className={cn(fieldState.error && "border-destructive ring-2 ring-destructive ring-offset-2")}>
-                                        <SelectValue placeholder="Select dept." />
+                                        <SelectValue placeholder={t.form.selectDept} />
                                       </SelectTrigger>
                                       <SelectContent>
                                         {departments.map(dept => (
-                                          <SelectItem key={dept.value} value={dept.value}>{dept.label}</SelectItem>
+                                          <SelectItem key={dept.value} value={dept.value}>
+                                            {t.departments[dept.value as keyof typeof t.departments]}
+                                          </SelectItem>
                                         ))}
                                       </SelectContent>
                                     </Select>
@@ -237,11 +343,11 @@ export default function DataEntryPage() {
                     </TableRow>
                   ))
                 ) : (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
-                      No tasks added. Click 'Add Row' or 'Import' to start.
-                    </TableCell>
-                  </TableRow>
+                <TableRow key="empty-state">
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    {t.form.noTasks}
+                  </TableCell>
+                </TableRow>
                 )}
               </TableBody>
             </Table>
@@ -253,21 +359,29 @@ export default function DataEntryPage() {
                   <AlertDialogTrigger asChild>
                     <Button type="button" disabled={loading}>
                       {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Batch Submit
+                      {t.form.batchSubmit}
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="bg-white border border-gray-200 text-gray-900 max-w-md">
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will submit all {fields.length} task(s) to the production system. This action cannot be undone.
+                      <AlertDialogTitle className="text-gray-900">
+                        {t.form.confirmSubmission}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="text-gray-600">
+                        {t.form.confirmDescription.replace('{count}', fields.length.toString())}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={form.handleSubmit(onSubmit)} disabled={loading || !form.formState.isValid}>
+                      <AlertDialogCancel className="bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-300">
+                        {t.form.cancel}
+                      </AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={form.handleSubmit(onSubmit)} 
+                        disabled={loading || !form.formState.isValid}
+                        className="bg-blue-600 text-white hover:bg-blue-700"
+                      >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Continue Submission
+                        {t.form.continue}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

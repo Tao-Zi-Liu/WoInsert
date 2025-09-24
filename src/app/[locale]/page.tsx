@@ -10,8 +10,45 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/icons";
-import { Loader2 } from "lucide-react";
+import { Loader2, Globe } from "lucide-react";
 import { useParams } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const translations = {
+  en: {
+    title: "Login",
+    description: "Enter your credentials to access your dashboard.",
+    email: "Email",
+    password: "Password",
+    emailPlaceholder: "Enter your email address",
+    passwordPlaceholder: "Enter your password",
+    loginButton: "Login",
+    loginSuccessful: "Login Successful",
+    redirecting: "Redirecting to your dashboard...",
+    loginFailed: "Login Failed",
+    invalidCredentials: "Invalid email or password.",
+    tagline: "Built for production excellence."
+  },
+  zh: {
+    title: "登录",
+    description: "输入您的账户信息。",
+    email: "邮箱",
+    password: "密码",
+    emailPlaceholder: "请输入您的邮箱地址",
+    passwordPlaceholder: "请输入您的密码",
+    loginButton: "登录",
+    loginSuccessful: "登录成功",
+    redirecting: "正在跳转到您的仪表板...",
+    loginFailed: "登录失败",
+    invalidCredentials: "邮箱或密码无效。",
+    tagline: "专为生产卓越而设计。"
+  }
+};
 
 export default function LoginPage() {
   const [email, setEmail] = useState("zeke@uniwigs.com");
@@ -20,9 +57,15 @@ export default function LoginPage() {
   const [authLoading, setAuthLoading] = useState(true);
   const router = useRouter();
   const params = useParams();
-  const locale = params.locale as string;
+  const locale = (params.locale as string) || 'en';
   const auth = getAuth(app);
   const { toast } = useToast();
+  
+  const t = translations[locale as keyof typeof translations] || translations.en;
+
+  const switchLanguage = (newLocale: string) => {
+    router.push(`/${newLocale}`);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -42,16 +85,16 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast({
-        title: "Login Successful",
-        description: "Redirecting to your dashboard...",
+        title: t.loginSuccessful,
+        description: t.redirecting,
       });
       router.push(`/${locale}/dashboard`);
     } catch (error: any) {
       console.error("Login failed:", error);
       toast({
         variant: "destructive",
-        title: "Login Failed",
-        description: error.message || "Invalid email or password.",
+        title: t.loginFailed,
+        description: error.message || t.invalidCredentials,
       });
     } finally {
       setLoading(false);
@@ -68,23 +111,49 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="h-8 w-8 px-0">
+              <Globe className="h-4 w-4" />
+              <span className="sr-only">Switch language</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() => switchLanguage('en')}
+              className={locale === 'en' ? 'bg-accent' : ''}
+            >
+              English
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => switchLanguage('zh')}
+              className={locale === 'zh' ? 'bg-accent' : ''}
+            >
+              中文
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <div className="flex items-center gap-2 mb-4">
         <Logo className="h-8 w-8 text-primary" />
         <h1 className="text-2xl font-bold text-foreground font-headline">TaskMaster Pro</h1>
       </div>
       <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
+          <CardTitle className="text-2xl">{t.title}</CardTitle>
+          <CardDescription>{t.description}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t.email}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email address"
+                placeholder={t.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -92,11 +161,11 @@ export default function LoginPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t.password}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t.passwordPlaceholder}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -105,13 +174,13 @@ export default function LoginPage() {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login
+              {t.loginButton}
             </Button>
           </form>
         </CardContent>
       </Card>
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Built for production excellence.
+        {t.tagline}
       </p>
     </main>
   );
