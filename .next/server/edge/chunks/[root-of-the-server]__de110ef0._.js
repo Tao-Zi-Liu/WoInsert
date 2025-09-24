@@ -23,26 +23,27 @@ var { g: global, __dirname } = __turbopack_context__;
 {
 __turbopack_context__.s({
     "config": (()=>config),
-    "default": (()=>__TURBOPACK__default__export__)
+    "middleware": (()=>middleware)
 });
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$esm$2f$development$2f$middleware$2f$middleware$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next-intl/dist/esm/development/middleware/middleware.js [middleware-edge] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$api$2f$server$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/next/dist/esm/api/server.js [middleware-edge] (ecmascript) <module evaluation>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/esm/server/web/spec-extension/response.js [middleware-edge] (ecmascript)");
 ;
-const __TURBOPACK__default__export__ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2d$intl$2f$dist$2f$esm$2f$development$2f$middleware$2f$middleware$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["default"])({
-    // A list of all locales that are supported
-    locales: [
+function middleware(request) {
+    // Check if there is any supported locale in the pathname
+    const pathname = request.nextUrl.pathname;
+    const pathnameIsMissingLocale = [
         'en',
         'zh'
-    ],
-    // Used when no locale matches
-    defaultLocale: 'en',
-    // Enable locale detection based on user preferences
-    localeDetection: true
-});
+    ].every((locale)=>!pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`);
+    // Redirect if there is no locale
+    if (pathnameIsMissingLocale) {
+        return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$spec$2d$extension$2f$response$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(new URL(`/en${pathname}`, request.url));
+    }
+}
 const config = {
-    // Match only internationalized pathnames
+    // Matcher ignoring `/_next/` and `/api/`
     matcher: [
-        '/',
-        '/(zh|en)/:path*'
+        '/((?!api|_next/static|_next/image|favicon.ico).*)'
     ]
 };
 }}),

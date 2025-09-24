@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, User } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/lib/firebase-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Logo } from "@/components/icons";
 import { Loader2 } from "lucide-react";
-import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 
 export default function LoginPage() {
@@ -24,8 +23,6 @@ export default function LoginPage() {
   const locale = params.locale as string;
   const auth = getAuth(app);
   const { toast } = useToast();
-  const t = useTranslations('login');
-  const tCommon = useTranslations('common');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -45,16 +42,16 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast({
-        title: t('loginSuccessful'),
-        description: t('redirecting'),
+        title: "Login Successful",
+        description: "Redirecting to your dashboard...",
       });
       router.push(`/${locale}/dashboard`);
     } catch (error: any) {
       console.error("Login failed:", error);
       toast({
         variant: "destructive",
-        title: t('loginFailed'),
-        description: error.message || t('invalidCredentials'),
+        title: "Login Failed",
+        description: error.message || "Invalid email or password.",
       });
     } finally {
       setLoading(false);
@@ -77,17 +74,17 @@ export default function LoginPage() {
       </div>
       <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl">{t('title')}</CardTitle>
-          <CardDescription>{t('description')}</CardDescription>
+          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">{t('email')}</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder={t('emailPlaceholder')}
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -95,11 +92,11 @@ export default function LoginPage() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">{t('password')}</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder={t('passwordPlaceholder')}
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -108,13 +105,13 @@ export default function LoginPage() {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t('loginButton')}
+              Login
             </Button>
           </form>
         </CardContent>
       </Card>
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        {tCommon('tagline')}
+        Built for production excellence.
       </p>
     </main>
   );
