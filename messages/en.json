@@ -1,0 +1,78 @@
+{
+    "login": {
+      "title": "Login",
+      "description": "Enter your credentials to access your dashboard.",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "Enter your email address",
+      "passwordPlaceholder": "Enter your password",
+      "loginButton": "Login",
+      "loginSuccessful": "Login Successful",
+      "redirecting": "Redirecting to your dashboard...",
+      "loginFailed": "Login Failed",
+      "invalidCredentials": "Invalid email or password."
+    },
+    "common": {
+      "loading": "Loading...",
+      "tagline": "Built for production excellence."
+    },
+    "dashboard": {
+      "dataEntry": "Data Entry",
+      "dataEntryDescription": "Add, import, or manage your production tasks.",
+      "submissionHistory": "Submission History",
+      "historyDescription": "A real-time view of all submitted production tasks.",
+      "template": "Template",
+      "import": "Import",
+      "addRow": "Add Row"
+    },
+    "form": {
+      "workOrderId": "Work Order ID",
+      "workListId": "Work List ID",
+      "quantity": "Quantity",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "department": "Department",
+      "action": "Action",
+      "pickDate": "Pick a date",
+      "selectDept": "Select dept.",
+      "batchSubmit": "Batch Submit",
+      "confirmSubmission": "Are you sure?",
+      "confirmDescription": "This will submit all {count} task(s) to the production system. This action cannot be undone.",
+      "cancel": "Cancel",
+      "continue": "Continue Submission",
+      "noTasks": "No tasks added. Click 'Add Row' or 'Import' to start.",
+      "submissionSuccessful": "Submission Successful",
+      "allTasksSubmitted": "All tasks have been submitted.",
+      "submissionFailed": "Submission Failed",
+      "checkErrors": "Please check the errors on each row."
+    },
+    "departments": {
+      "FIN": "Finishing",
+      "ASM": "Assembly", 
+      "QAC": "Quality Control",
+      "PKG": "Packaging",
+      "WHS": "Warehouse"
+    },
+    "history": {
+      "title": "Submission History",
+      "description": "A real-time view of all submitted production tasks.",
+      "workOrderId": "Work Order ID",
+      "workListId": "Work List ID",
+      "quantity": "Quantity",
+      "plannedStart": "Planned Start",
+      "plannedEnd": "Planned End", 
+      "department": "Department",
+      "status": "Status",
+      "submitter": "Submitter",
+      "submissionTime": "Submission Time (BJT)",
+      "noSubmissions": "No submitted tasks yet.",
+      "showingResults": "Showing {count} submissions. Data is updated in real-time.",
+      "statusPlanned": "Planned",
+      "statusReleased": "Released",
+      "statusCompleted": "Completed"
+    },
+    "navigation": {
+      "logout": "Log out",
+      "operator": "Operator"
+    }
+  }

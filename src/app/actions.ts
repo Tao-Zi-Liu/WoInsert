@@ -1,6 +1,5 @@
 "use server";
 
-import { adminDb } from "@/lib/firebase-admin-config";
 import { type Task } from "@/lib/definitions";
 import { validateAndExplainData, type ValidationInput } from "@/ai/flows/validate-and-explain-data";
 import { formatInTimeZone } from 'date-fns-tz';
@@ -52,10 +51,10 @@ export async function submitTasks(tasks: Task[]): Promise<SubmissionResult> {
       if (hasEmptyFields) {
           return { index, isValid: false, explanation: "All fields are required." };
       }
-      return { index, ...result, field: 'WO_WOID' as keyof Task };
+      return { index, ...result, field: 'WO_WLID' as keyof Task };
     } catch(e: any) {
       console.error("AI Validation Error:", e);
-      return { index, isValid: false, explanation: e.message || "An error occurred during AI validation." }
+      return { index, isValid: false, explanation: e.message || "An error occurred during validation." }
     }
   });
 
@@ -71,59 +70,24 @@ export async function submitTasks(tasks: Task[]): Promise<SubmissionResult> {
       });
     }
   });
-  
-  // New check: Use admin SDK to check for existence in Firestore for all tasks not already marked with an error
-  const validTasks = tasks.filter((_, index) => !errors.some(e => e.rowIndex === index));
-  if (validTasks.length > 0) {
-      const woidChecks = validTasks.map(task => adminDb.collection('production_tasks').doc(task.WO_WOID).get());
-      const woidDocs = await Promise.all(woidChecks);
-
-      woidDocs.forEach((doc, i) => {
-          if (doc.exists) {
-              const originalIndex = tasks.findIndex(t => t.WO_WOID === validTasks[i].WO_WOID);
-              // Avoid adding duplicate error messages
-              if (!errors.some(e => e.rowIndex === originalIndex)) {
-                errors.push({
-                    rowIndex: originalIndex,
-                    message: `WO_WOID '${validTasks[i].WO_WOID}' already exists in the database.`,
-                    field: 'WO_WOID'
-                });
-              }
-          }
-      });
-  }
-
 
   if (errors.length > 0) {
     return { success: false, errors: errors.sort((a,b) => a.rowIndex - b.rowIndex) };
   }
 
-  // If all validations pass, proceed to batch write to Firestore
+  // If all validations pass, we would insert into Oracle database here
+  // For now, we'll just return success (you'll need to implement Oracle insertion later)
   try {
-    const batch = adminDb.batch();
-    const beijingTime = formatInTimeZone(new Date(), 'Asia/Shanghai', 'yyyy-MM-dd HH:mm:ss');
-
-    tasks.forEach((task) => {
-      const docRef = adminDb.collection("production_tasks").doc(task.WO_WOID);
-      const newTask = {
-        ...task,
-        WO_GCID: '01',
-        WO_LX: 'MPS',
-        WO_ZT: 'P',
-        WO_DZSC: 'N',
-        WO_WHRID: 'GYGJ240328',
-        WO_WHSJ: beijingTime,
-      };
-      batch.set(docRef, newTask);
-    });
-
-    await batch.commit();
+    // TODO: Implement Oracle database insertion here
+    console.log('Tasks validated successfully. Oracle insertion not yet implemented.');
+    console.log('Tasks to insert:', tasks);
+    
     return { success: true };
   } catch (error: any) {
-    console.error("Firestore batch commit failed:", error);
+    console.error("Database insertion failed:", error);
     return {
       success: false,
-      errors: [{ rowIndex: 0, message: `Firestore error: ${error.message}` }],
+      errors: [{ rowIndex: 0, message: `Database error: ${error.message}` }],
     };
   }
 }

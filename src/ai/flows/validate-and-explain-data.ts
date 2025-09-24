@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {firestore} from 'firebase-admin';
 
 const ValidationInputSchema = z.object({
   wo_woid: z.string().describe('Work Order ID'),
@@ -56,37 +55,54 @@ Here are the validation rules:
 1.  All fields (WO_WOID, WO_WLID, WO_XQSL, WO_JHKGRQ, WO_JHWGRQ, WO_BMID) are required.
 2.  WO_XQSL must be a number greater than 0.
 3.  WO_WOID must be unique within the current form (check against {{{all_woids}}}).
-4.  WO_WOID must exist in the Firestore database (production_tasks collection).
-5.  WO_WLID must exist in the Firestore database.
+4.  WO_WLID must exist in the Oracle ERP database (WLXX table, WLXX_WLID column).
 
 Respond with a JSON object (following the ValidationOutputSchema) indicating whether the data is valid and providing a detailed explanation of any validation errors. Make sure to set isValid to false if ANY of the above checks fail.
 
-WO_WOID and WO_WLID existence in Firestore cannot be validated by you directly; assume the tool will perform the check and indicate this in the explanation if you have marked the entire form as invalid.  In other words, if a field is missing, or XQSL is invalid, do not reference rules 4 and 5.
+WO_WLID existence in Oracle database cannot be validated by you directly; assume the tool will perform the check and indicate this in the explanation if you have marked the entire form as invalid due to other validation failures.
 `,
 });
 
-const checkFirestoreData = ai.defineTool(
+const checkOracleWLID = ai.defineTool(
   {
-    name: 'checkFirestoreData',
-    description: 'Checks if WO_WOID and WO_WLID exist in the Firestore database.',
+    name: 'checkOracleWLID',
+    description: 'Checks if WO_WLID exists in the Oracle ERP database WLXX table.',
     inputSchema: z.object({
-      wo_woid: z.string().describe('The WO_WOID to check.'),
       wo_wlid: z.string().describe('The WO_WLID to check.'),
     }),
     outputSchema: z.object({
-      wo_woid_exists: z.boolean().describe('Whether WO_WOID exists in Firestore.'),
-      wo_wlid_exists: z.boolean().describe('Whether WO_WLID exists in Firestore.'),
+      exists: z.boolean().describe('Whether WO_WLID exists in Oracle database.'),
+      error: z.string().optional().describe('Error message if validation failed.'),
     }),
   },
   async input => {
-    const db = firestore();
-    const wo_woid_doc = await db.collection('production_tasks').doc(input.wo_woid).get();
-    const wo_wlid_doc = await db.collection('production_tasks').where('WO_WLID', '==', input.wo_wlid).get();
+    try {
+      const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/validate-wlid`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ woWlid: input.wo_wlid }),
+      });
 
-    return {
-      wo_woid_exists: wo_woid_doc.exists,
-      wo_wlid_exists: !wo_wlid_doc.empty,
-    };
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          exists: false,
+          error: data.error || 'Database validation failed',
+        };
+      }
+
+      return {
+        exists: data.exists,
+      };
+    } catch (error: any) {
+      return {
+        exists: false,
+        error: error.message || 'Network error during validation',
+      };
+    }
   }
 );
 
@@ -103,15 +119,21 @@ const validateAndExplainDataFlow = ai.defineFlow(
       return output!;
     }
 
-    const firestoreCheck = await checkFirestoreData({
-      wo_woid: input.wo_woid,
+    const oracleCheck = await checkOracleWLID({
       wo_wlid: input.wo_wlid,
     });
 
-    if (!firestoreCheck.wo_woid_exists || !firestoreCheck.wo_wlid_exists) {
+    if (oracleCheck.error) {
       return {
         isValid: false,
-        explanation: `WO_WOID ${input.wo_woid} exists: ${firestoreCheck.wo_woid_exists}, WO_WLID ${input.wo_wlid} exists: ${firestoreCheck.wo_wlid_exists}.  WO_WOID and/or WO_WLID does not exist in the Firestore database.`,
+        explanation: `Database validation error: ${oracleCheck.error}`,
+      };
+    }
+
+    if (!oracleCheck.exists) {
+      return {
+        isValid: false,
+        explanation: `WO_WLID '${input.wo_wlid}' does not exist in the ERP system database (WLXX table).`,
       };
     }
 

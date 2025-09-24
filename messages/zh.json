@@ -1,0 +1,78 @@
+{
+    "login": {
+      "title": "登录",
+      "description": "输入您的账户信息。",
+      "email": "邮箱",
+      "password": "密码",
+      "emailPlaceholder": "请输入您的邮箱地址",
+      "passwordPlaceholder": "请输入您的密码",
+      "loginButton": "登录",
+      "loginSuccessful": "登录成功",
+      "redirecting": "正在跳转到您的仪表板...",
+      "loginFailed": "登录失败",
+      "invalidCredentials": "邮箱或密码无效。"
+    },
+    "common": {
+      "loading": "加载中...",
+      "tagline": "专为生产卓越而设计。"
+    },
+    "dashboard": {
+      "dataEntry": "数据录入",
+      "dataEntryDescription": "添加、导入或管理您的生产任务。",
+      "submissionHistory": "提交历史",
+      "historyDescription": "所有已提交生产任务的实时视图。",
+      "template": "模板",
+      "import": "导入",
+      "addRow": "添加行"
+    },
+    "form": {
+      "workOrderId": "工作订单号",
+      "workListId": "工作清单号",
+      "quantity": "数量",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "department": "部门",
+      "action": "操作",
+      "pickDate": "选择日期",
+      "selectDept": "选择部门",
+      "batchSubmit": "批量提交",
+      "confirmSubmission": "确认提交？",
+      "confirmDescription": "这将向生产系统提交全部 {count} 个任务。此操作无法撤销。",
+      "cancel": "取消",
+      "continue": "继续提交",
+      "noTasks": "未添加任务。点击"添加行"或"导入"开始。",
+      "submissionSuccessful": "提交成功",
+      "allTasksSubmitted": "所有任务已提交。",
+      "submissionFailed": "提交失败",
+      "checkErrors": "请检查每行的错误。"
+    },
+    "departments": {
+      "FIN": "精整",
+      "ASM": "装配", 
+      "QAC": "质量控制",
+      "PKG": "包装",
+      "WHS": "仓库"
+    },
+    "history": {
+      "title": "提交历史",
+      "description": "所有已提交生产任务的实时视图。",
+      "workOrderId": "工作订单号",
+      "workListId": "工作清单号",
+      "quantity": "数量",
+      "plannedStart": "计划开始",
+      "plannedEnd": "计划结束", 
+      "department": "部门",
+      "status": "状态",
+      "submitter": "提交者",
+      "submissionTime": "提交时间（北京时间）",
+      "noSubmissions": "暂无已提交的任务。",
+      "showingResults": "显示 {count} 条提交记录。数据实时更新。",
+      "statusPlanned": "计划中",
+      "statusReleased": "已发布",
+      "statusCompleted": "已完成"
+    },
+    "navigation": {
+      "logout": "退出登录",
+      "operator": "操作员"
+    }
+  }
