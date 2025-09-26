@@ -2,6 +2,29 @@
 # https://firebase.google.com/docs/app-hosting/configure
 
 runConfig:
-  # Increase this value if you'd like to automatically spin up
-  # more instances in response to increased traffic.
   maxInstances: 1
+
+env:
+  # Firebase Admin Configuration
+  - variable: FIREBASE_PROJECT_ID
+    value: studio-9024067253-54f69
+  - variable: FIREBASE_CLIENT_EMAIL
+    value: "firebase-adminsdk-fbsvc@studio-9024067253-54f69.iam.gserviceaccount.com"
+  - variable: FIREBASE_PRIVATE_KEY
+    value: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDFHaKXSbqyolVQ\nltUZDumzFGPm/b013lesyu7FWXOW+dJR86OAZBprq5vLYID7OWwfOuqgxGYqcQSC\nisi6izROwMeTyMfRSahBodT00DSUxhM4NSFmoixvbG4zyByg6+JXyMb1GNU7S6qn\nAS+wkEIbw8+6zTOl/s4oVWlkTubKGZ3D/58i8j+6QZ2NzOBGfPL9HcPpMMNgjmGu\nCuAiJ/GdaRl1XHyFqj6GDBqqB1PToM57ECC/Bc95xsaDt8B7Euk4Bg3PfRfv/ciy\nHBOGbKtXL0guw78jUyf3LvR1FKofcL39mdqQQIv00uNkPtDVYstuYDIb+zF4FLll\nhy0/kxlFAgMBAAECggEAC9BBnxcOXyfe/Jg5l8mexHqPnTeuWBTmBMdZxY6doJoC\n2qIDNc3qDnNnwCnduRDBM+L0TmPO6rLAzjESpCl1HlYr7+W74gVr1dkk2fJDgHoZ\ni0gV4yCLkLb7KNPQsW1JsLCqCeTt3KKljOJDkS2oJKFY6Q1kz8lEYkLyMM6QwuJo\nmGpOvu7hhAzE/COlQH2J3gzc+oy5VVQNoQ2BMledGGgesekyjUhS0XTDAAX1JTU9\nc4ukIZ8WG3ZlDgWKDcg6yRSnNNSuvgyvOqRZrnned2Tt3rWCmpXL5lMxOTvSgQLd\n+2XVm4aANe146mg1+A5/uFf8Upz69xxdfU1cMKnIeQKBgQD2vmLpsrrVsVtJEo0r\nFTcJlHFOOxAIed/wDca0Ry9aY3ZWbN47/AhXgTcl+aL6e9beGEUwyUrCSbpBPP77\nOd+fkxYivWHA/2LM6PFhKD1+6orNSruTTRssctfoWgvK5BqTzrEQec3Ub8LPNNQN\nVH6PnnfU7uHAXWmXG9Oit/SdzQKBgQDMgqUOpnwMl2QnBrg+cmpGDXWYR1itFIIo\nnt9f7PjrsdxE4W0patP34a4IE7Vm+HEkEbTIJuzhhAeZPgO0ArnK9+VCZJy2MpX6\ntJT2pwQ95BpaKapUAyo2+7j06EZeGAkC+mebk5kCacIF4v0LvCwfVwXlDEujtVhe\nWqg/6qQxWQKBgCGJx1AUpyicrtfD2cRdYdm/f5cumANO7Y1nkfa3JkyW8GLW8W4d\n19RtD93tjKWXZ6FQkzcKZUr7UoHDlLT5LNg32e5m536gOAG6N/UIzzMNFkjJO63N\n8T+dbJN8idXOI36rvY2LwNp7RnN7rscRERLca1VaEv1etReBBMc9UdaRAoGARsun\nFeY+JSG3Uuc5mqyC65M3NSrloKzrzeIJk6x2Eyl0Bgg/gMnxbOscEsG311iD2iei\n/HK1J/BLrRnRsFwNMx0TqSMpOM1ULACdXLE+f6paEQJBa2nZEEWdpnJOAb6yR+yl\nNy8mFbbEqsMENC7E22iFqt/Rw29AkxExE0dH5akCgYEAqJY462YWunEDwVTfOybs\nu9x/Kd4UfcicsAsGZcxsv+fQQ94Ncit37Q88c+A6nTTp0PoIUmNBMxhgm72Qk905\nL5B0BN3grIwCXe3SvvPB/T6IChmU5wZbEpoaEsjwV+LfLXQvKVJHC1bHVl5PEw7u\np1Lp/Ym5bV15AREOJwalqjM=\n-----END PRIVATE KEY-----\n"
+  
+  # Oracle Database Configuration
+  - variable: ORACLE_HOST
+    value: "118.190.204.137"
+  - variable: ORACLE_PORT
+    value: "1521"
+  - variable: ORACLE_SERVICE_NAME
+    value: "orcl"
+  - variable: ORACLE_USER
+    value: "gygj"
+  - variable: ORACLE_PASSWORD
+    value: "gygj"
+  
+  # Next.js Configuration
+  - variable: NEXTAUTH_URL
+    value: "https://woinsert--studio-9024067253-54f69.us-central1.hosted.app"

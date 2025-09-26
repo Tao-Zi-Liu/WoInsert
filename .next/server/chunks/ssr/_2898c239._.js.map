@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/user/studio/src/app/%5Blocale%5D/layout.tsx"],"sourcesContent":["import {setRequestLocale} from 'next-intl/server';\n\nexport default function LocaleLayout({\n  children,\n  params: {locale}\n}: {\n  children: React.ReactNode;\n  params: {locale: string};\n}) {\n  // Enable static rendering\n  setRequestLocale(locale);\n\n  return children;\n}\n\nexport function generateStaticParams() {\n  return [{locale: 'en'}, {locale: 'zh'}];\n}"],"names":[],"mappings":";;;;AAAA;;AAEe,SAAS,aAAa,EACnC,QAAQ,EACR,QAAQ,EAAC,MAAM,EAAC,EAIjB;IACC,0BAA0B;IAC1B,CAAA,GAAA,2QAAA,CAAA,mBAAgB,AAAD,EAAE;IAEjB,OAAO;AACT;AAEO,SAAS;IACd,OAAO;QAAC;YAAC,QAAQ;QAAI;QAAG;YAAC,QAAQ;QAAI;KAAE;AACzC","debugId":null}}]
-}

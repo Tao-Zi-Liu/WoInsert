@@ -1,7 +1,7 @@
 "use server";
 
 import { type Task } from "@/lib/definitions";
-import { validateAndExplainData, type ValidationInput } from "@/ai/flows/validate-and-explain-data";
+//import { validateAndExplainData, type ValidationInput } from "@/ai/flows/validate-and-explain-data";
 import { formatInTimeZone } from 'date-fns-tz';
 
 type SubmissionResult = {
@@ -58,7 +58,15 @@ export async function submitTasks(tasks: Task[]): Promise<SubmissionResult> {
     }
   });
 
-  const validationResults = await Promise.all(validationPromises);
+  const validationResults = tasks.map((task, index) => {
+    // Simple frontend validation
+    const hasEmptyFields = Object.values(task).some(v => v === '');
+    if (hasEmptyFields) {
+      return { index, isValid: false, explanation: "All fields are required." };
+    }
+    return { index, isValid: true, explanation: "Valid" };
+  });
+  
   const errors: { rowIndex: number; message: string; field?: keyof Task }[] = [];
 
   validationResults.forEach((result) => {

@@ -1,17 +1,5 @@
 {
-  "node": {
-    "406b3b25286ef5cf4d6f245caa97c878283a37f3eb": {
-      "workers": {
-        "app/[locale]/dashboard/page": {
-          "moduleId": "[project]/.next-internal/server/app/[locale]/dashboard/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/app/actions.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/[locale]/dashboard/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
-  "encryptionKey": "AODKCgLADFmXgHok+I2R56nKyseFO4hbmvXmRiwkoq8="
+  "encryptionKey": "RfMAd5D6xkK7MGU2pw9I1rK4n2gWT2l1j06jZgoAcfg="
 }
