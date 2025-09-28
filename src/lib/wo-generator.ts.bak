@@ -1,0 +1,96 @@
+import { formatInTimeZone } from 'date-fns-tz';
+import { adminDb } from './firebase-admin-config';
+
+/**
+ * Generate Work Order ID in format: UW[YYMMDD][NN]
+ * Example: UW25091101, UW25091102
+ * NN is a sequential number for the day (01-99)
+ */
+export async function generateWOID(): Promise<string> {
+  const timezone = 'Asia/Shanghai';
+  const now = new Date();
+  
+  // Format date components in Beijing time
+  const dateStr = formatInTimeZone(now, timezone, 'yyMMdd');
+  
+  // Get today's sequence number from Firestore
+  const sequenceDoc = await adminDb
+    .collection('wo_sequences')
+    .doc(dateStr)
+    .get();
+  
+  let sequence = 1;
+  
+  if (sequenceDoc.exists) {
+    sequence = (sequenceDoc.data()?.lastSequence || 0) + 1;
+  }
+  
+  // Update the sequence in Firestore
+  await adminDb
+    .collection('wo_sequences')
+    .doc(dateStr)
+    .set({ 
+      lastSequence: sequence,
+      lastUpdated: now
+    });
+  
+  // Format sequence with leading zero
+  const sequenceStr = sequence.toString().padStart(2, '0');
+  
+  return `UW${dateStr}${sequenceStr}`;
+}
+
+/**
+ * Generate multiple Work Order IDs for batch operations
+ */
+export async function generateBatchWOIDs(count: number): Promise<string[]> {
+  const timezone = 'Asia/Shanghai';
+  const now = new Date();
+  
+  // Format date components in Beijing time
+  const dateStr = formatInTimeZone(now, timezone, 'yyMMdd');
+  
+  // Get and update sequence in one transaction
+  const sequenceRef = adminDb.collection('wo_sequences').doc(dateStr);
+  
+  const woIds: string[] = [];
+  
+  await adminDb.runTransaction(async (transaction) => {
+    const sequenceDoc = await transaction.get(sequenceRef);
+    
+    let currentSequence = sequenceDoc.exists 
+      ? (sequenceDoc.data()?.lastSequence || 0) 
+      : 0;
+    
+    for (let i = 0; i < count; i++) {
+      currentSequence++;
+      const sequenceStr = currentSequence.toString().padStart(2, '0');
+      woIds.push(`UW${dateStr}${sequenceStr}`);
+    }
+    
+    transaction.set(sequenceRef, {
+      lastSequence: currentSequence,
+      lastUpdated: now
+    });
+  });
+  
+  return woIds;
+}
+
+/**
+ * Generate Manufacturing Order Number (制令号)
+ * Format: [YYYYMMDDHHMMSS]-H[NNNN]
+ * Example: 20250907182851-H0365
+ */
+export function generateZLH(): string {
+  const timezone = 'Asia/Shanghai';
+  const now = new Date();
+  
+  // Format timestamp in Beijing time
+  const timestamp = formatInTimeZone(now, timezone, 'yyyyMMddHHmmss');
+  
+  // Generate a random 4-digit number
+  const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  
+  return `${timestamp}-H${randomNum}`;
+}

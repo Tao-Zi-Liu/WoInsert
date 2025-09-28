@@ -1,1 +1,6 @@
-{}
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/validate-wlid/route": "app/api/validate-wlid/route.js",
+  "/[locale]/dashboard/history/page": "app/[locale]/dashboard/history/page.js",
+  "/[locale]/dashboard/page": "app/[locale]/dashboard/page.js"
+}

@@ -1,18 +1,20 @@
 import {setRequestLocale} from 'next-intl/server';
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
-  params: {locale}
+  params
 }: {
   children: React.ReactNode;
-  params: {locale: string};
+  params: Promise<{locale: string}>;
 }) {
-  // Enable static rendering
-  setRequestLocale(locale);
+  const {locale} = await params;
+  
+  // Enable static rendering - Chinese only
+  setRequestLocale('zh');
 
   return children;
 }
 
 export function generateStaticParams() {
-  return [{locale: 'en'}, {locale: 'zh'}];
+  return [{locale: 'zh'}]; // Chinese only
 }

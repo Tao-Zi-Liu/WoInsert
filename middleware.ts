@@ -4,13 +4,11 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   // Check if there is any supported locale in the pathname
   const pathname = request.nextUrl.pathname;
-  const pathnameIsMissingLocale = ['en', 'zh'].every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  );
+  const pathnameIsMissingLocale = !pathname.startsWith('/zh');
 
-  // Redirect if there is no locale
-  if (pathnameIsMissingLocale) {
-    return NextResponse.redirect(new URL(`/en${pathname}`, request.url));
+  // Redirect if there is no locale - always redirect to Chinese
+  if (pathnameIsMissingLocale && !pathname.startsWith('/_next') && !pathname.startsWith('/api')) {
+    return NextResponse.redirect(new URL(`/zh${pathname}`, request.url));
   }
 }
 
