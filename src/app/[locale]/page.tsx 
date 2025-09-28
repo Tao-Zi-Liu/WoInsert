@@ -1,0 +1,13 @@
+import { redirect } from 'next/navigation';
+
+// This page component will handle requests for the root of each locale,
+// for example, /en or /zh.
+export default function LocaleRootPage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  // It immediately redirects the user to the dashboard page for that locale.
+  // For instance, a request to /en will be redirected to /en/dashboard.
+  redirect(`/${locale}/dashboard`);
+}

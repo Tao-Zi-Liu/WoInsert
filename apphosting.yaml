@@ -27,4 +27,4 @@ env:
   
   # Next.js Configuration
   - variable: NEXTAUTH_URL
-    value: "https://woinsert--studio-9024067253-54f69.us-central1.hosted.app"
+    value: "https://studio--studio-9024067253-54f69.us-central1.hosted.app"
